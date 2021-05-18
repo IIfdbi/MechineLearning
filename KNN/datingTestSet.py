@@ -103,8 +103,6 @@ def showdatas(datingDataMat, datingLabels):
     # axs3_xlabel_text = axs[1][1].set_xlabel(u'x轴')
     # axs3_ylabel_text = axs[1][1].set_ylabel(u'y轴')
 
-
-
     #设置图例
     didntLike = mlines.Line2D([], [], color='black', marker='.',
                       markersize=6, label='didntLike')
