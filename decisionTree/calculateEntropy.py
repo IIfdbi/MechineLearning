@@ -1,4 +1,5 @@
 from math import log
+import operator
 """
 函数说明：创建测试数集
 Returns:
@@ -21,7 +22,7 @@ def createDataSet():
 			[2, 1, 0, 1, 'yes'],
 			[2, 1, 0, 2, 'yes'],
 			[2, 0, 0, 0, 'no']]
-	labels = ['不放贷', '放贷'] #分类属性
+	labels = ['年龄', '有工作','有自己的房子','信贷情况'] #特征标签
 	return dataSet,labels
 """
 函数说明：计算给定数据集的熵
@@ -67,12 +68,13 @@ def chooseBestImformationGain(dataSet):
 			#用subDataSet做熵值运算
 			currentEntropy = calculateEntropy(subDataSet)
 			newEntropy += prob * currentEntropy
+		print("%.3f ----- %.3f" % (baseEntropy,newEntropy))
 		informationGain = baseEntropy - newEntropy
 		print("第%d个特征的增益为 %.3f" % (i,informationGain))
 		if informationGain > bestImforGain :
 			bestImforGain = informationGain
 			bestImforGainLoc = i
-		
+	print("最好的信息增益值为：%.3f，是第%d个特征" % (bestImforGain,bestImforGainLoc))	
 	return bestImforGain,bestImforGainLoc
 			
 """ 
@@ -84,23 +86,75 @@ return：
 	no - 不批准贷款
 	yes - 批准贷款
 """
-def splitDataSet(dataSeti,i,value):
+def splitDataSet(dataSet,i,value):
 	subDataSet = []
-	no = 0
-	yes = 0
+
 	for featureVec in dataSet:
 		if featureVec[i] == value:
-			subDataSet.append(featureVec)
-
+			reduceFeatVec = featureVec[:i]	#执行实现删除i列与value值相等的数据，返回其他列的数据
+			reduceFeatVec.extend(featureVec[i+1:])
+			subDataSet.append(reduceFeatVec)
+			
 	return subDataSet  
 			
+
+"""
+函数说明：创建决策树
+param:
+	dataSet - 数据集
+	labels - 分类属性标签
+	featLabels - 存储选择的最优特征标签
+Returns:
+	myTree - 决策树
+"""
+def createTree(dataSet,labels):
+	print(dataSet)
+	print(labels)
+	print("~~~~~~~")
+	classList = [example[-1] for example in dataSet]	#取分类标签（是否放贷：yes / no）
+	if classList.count(classList[0]) == len(classList):	#如果类别完全相同的时候则停止继续划分
+		return classList[0]	#返回这个标签
+	if len(dataSet[0]) == 1 or len(labels) == 0:	#当递归循环到测试集合的长度为1或者是标签特征全部用完之后姐结束构建书了
+		return majorityCnt(classList)
+	bestImforGain,bestFeat = chooseBestImformationGain(dataSet)	#选择最优特征，找到最优特征的位置
+	bestFeatLabel = labels[bestFeat]	#得出最优特征的标签
+	# featLabels.append(bestFeatLabel)	#将得出来的最优的标签添加到集合中
+	myTree = {bestFeatLabel:{}}	#根据每次的最优标签生成树
+	del(labels[bestFeat])	#删除已经使用过的标签
+	featValues = [example[bestFeat] for example in dataSet]	#得到训练集中所有的最优特征的属性值
+	uniqueVals = set(featValues)	#去掉重复的属性值
+	for value in uniqueVals:
+		myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet,bestFeat,value),labels)
+		
+	return myTree
+
+"""
+函数说明：统计classList中出现次数最多的元素
+param：	
+	classList	-	类标签列表
+returns:
+	sortedClassCount[0][0] - 返回最多出现次数的类标签
+"""
+def majorityCnt(clasList):
+	classCount = {}
+	for vote in clasList:
+		if vote not in classCount:
+			classCount[vote] = 0
+		classCount += 1
+	sortedClassCount = sorted(classCount.items(),key = operator.itemgetter(1),reverse = True)
+	return sortedClassCount[0][0]
 				
 if __name__ == '__main__':
-	dataSet,features = createDataSet()
+	dataSet,labels = createDataSet()
 	# entropy = calculateEntropy(dataSet)
 	# print(entropy)
-	bestImforGain,bestImforGainLoc = chooseBestImformationGain(dataSet)
-	print("最好的信息增益值为：%.3f，是第%d个特征" % (bestImforGain,bestImforGainLoc + 1))
+	# bestImforGain,bestImforGainLoc = chooseBestImformationGain(dataSet)
+	# print("最好的信息增益值为：%.3f，是第%d个特征" % (bestImforGain,bestImforGainLoc + 1))
+	# featLabels = []
+	# myTree = createTree(dataSet,labels,featLabels)
+	myTree = createTree(dataSet,labels)
+	print(myTree)
+	
 
 	
 	
