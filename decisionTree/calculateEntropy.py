@@ -30,7 +30,7 @@ param：
 	dataSet - 数据集
 return:
 	entropy - 熵值
-"""	
+"""
 def calculateEntropy(dataSet):
 	numOfData = len(dataSet)
 	labelCount = {}
@@ -74,10 +74,10 @@ def chooseBestImformationGain(dataSet):
 		if informationGain > bestImforGain :
 			bestImforGain = informationGain
 			bestImforGainLoc = i
-	print("最好的信息增益值为：%.3f，是第%d个特征" % (bestImforGain,bestImforGainLoc))	
+	print("最好的信息增益值为：%.3f，是第%d个特征" % (bestImforGain,bestImforGainLoc))
 	return bestImforGain,bestImforGainLoc
-			
-""" 
+
+"""
 函数说明：根据列号划分好不同的特征的数据
 param：
 	dataSet - 数据集
@@ -94,9 +94,9 @@ def splitDataSet(dataSet,i,value):
 			reduceFeatVec = featureVec[:i]	#执行实现删除i列与value值相等的数据，返回其他列的数据
 			reduceFeatVec.extend(featureVec[i+1:])
 			subDataSet.append(reduceFeatVec)
-			
-	return subDataSet  
-			
+
+	return subDataSet
+
 
 """
 函数说明：创建决策树
@@ -125,12 +125,12 @@ def createTree(dataSet,labels):
 	uniqueVals = set(featValues)	#去掉重复的属性值
 	for value in uniqueVals:
 		myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet,bestFeat,value),labels)
-		
+
 	return myTree
 
 """
 函数说明：统计classList中出现次数最多的元素
-param：	
+param：
 	classList	-	类标签列表
 returns:
 	sortedClassCount[0][0] - 返回最多出现次数的类标签
@@ -143,7 +143,7 @@ def majorityCnt(clasList):
 		classCount += 1
 	sortedClassCount = sorted(classCount.items(),key = operator.itemgetter(1),reverse = True)
 	return sortedClassCount[0][0]
-				
+
 if __name__ == '__main__':
 	dataSet,labels = createDataSet()
 	# entropy = calculateEntropy(dataSet)
@@ -154,11 +154,3 @@ if __name__ == '__main__':
 	# myTree = createTree(dataSet,labels,featLabels)
 	myTree = createTree(dataSet,labels)
 	print(myTree)
-	
-
-	
-	
-	
-	
-	
-	
